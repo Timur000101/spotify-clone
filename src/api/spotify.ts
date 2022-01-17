@@ -1,6 +1,6 @@
 export const authEndpoint = "https://accounts.spotify.com/authorize";
 
-const CLIENT_ID = "7b48e85c4f0a48059348e1cc83b511f5";
+const CLIENT_ID = "ebdac79023bf4a9c9d09161d76066f70";
 const redirectUri = "http://localhost:8080/";
 const scopes = [
   "user-read-currently-playing",
@@ -8,8 +8,6 @@ const scopes = [
   "user-read-playback-state",
   "user-top-read",
   "user-modify-playback-state",
-  "playlist-read-collaborative",
-  "playlist-modify-public",
 ];
 
 export const getTokenFromResponse = (): Array<any> => {

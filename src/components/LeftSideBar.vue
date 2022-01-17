@@ -138,7 +138,6 @@ export default defineComponent({
     spotify.setAccessToken(sessionStorage.token);
     if (sessionStorage.getItem("token")) {
       spotify.getUserPlaylists().then((res) => {
-        console.log(res.items);
         playlist.value = res.items;
       });
     }

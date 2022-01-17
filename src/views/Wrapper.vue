@@ -5,7 +5,6 @@
       <Header class="header" />
       <slot></slot>
     </div>
-    <Player class="player" />
   </div>
 </template>
 
@@ -13,12 +12,12 @@
 import { defineComponent } from 'vue'
 import Header from "@/components/Header.vue"
 import LeftSideBar from "@/components/LeftSideBar.vue"
-import Player from "@/components/Player.vue"
+// import Player from "@/components/Player.vue"
 export default defineComponent({
   components: {
     Header,
     LeftSideBar,
-    Player,
+    // Player,
   }
 })
 </script>
@@ -34,7 +33,7 @@ export default defineComponent({
     background-color: black;
   }
   .root__content {
-    padding: 84px 30px 120px 30px;
+    // padding: 84px 30px 120px 30px;
     background-color: #121212;
     overflow: auto;
     scrollbar-width: thin;
@@ -45,7 +44,8 @@ export default defineComponent({
       width: calc(100% - 300px);
       top: 0;
       left: 300px;
-      background: #201060;
+      background: none;
+      z-index: 90;
     }
     &::-webkit-scrollbar {
       width: 10px;
@@ -59,13 +59,5 @@ export default defineComponent({
       background: #5a5a5a;
     }
   }
-}
-.player {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  background: #181818;
-  border-top: 1px solid #282828;
 }
 </style>
