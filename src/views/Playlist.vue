@@ -152,7 +152,7 @@
 
 <script lang="ts">
 import { useRoute } from "vue-router";
-import { defineComponent, ref, computed, watch } from "vue";
+import { defineComponent, ref, Ref, computed, watch, onMounted } from "vue";
 import SpotifyWebApi from "spotify-web-api-js";
 import { playlistTracksSize } from "@/helpers/playlist";
 import Wrapper from "./Wrapper.vue";
@@ -166,9 +166,9 @@ export default defineComponent({
   },
   setup(props) {
     const route = useRoute();
-    const playlistInfo: any = ref<Array<any>>([]);
-    const playlistTracks: any = ref<Array<any>>([]);
-    const playlistId: any = route.params.id;
+    const playlistInfo: Ref<object> = ref<object>({});
+    const playlistTracks: Ref<Array<object>> = ref<Array<object>>([]);
+    const playlistId: string = String(route.params.id);
     const playlistTracksSz = playlistTracksSize;
     let currentPLayTrackId = ref<string>('')
     spotify.setAccessToken(sessionStorage.token);
@@ -176,7 +176,7 @@ export default defineComponent({
     watch(currentPLayTrackId, (newValue) => {
       currentPLayTrackId.value = newValue
     })
-
+    console.log(playlistId);
     if (sessionStorage.getItem("token")) {
       spotify.getPlaylist(playlistId).then((res) => {
         playlistInfo.value = res;
@@ -186,7 +186,8 @@ export default defineComponent({
 
     const allTracksSize = computed(() => {
       let playlistDurationSize = 0;
-      playlistTracks.value.forEach((item: any) => {
+      playlistTracks.value.forEach((item) => {
+        console.log(typeof item)
         playlistDurationSize += item.track.duration_ms;
       });
       return playlistDurationSize;
@@ -220,6 +221,10 @@ export default defineComponent({
         })
       sessionStorage.setItem('currentTrack', trackId)
     }
+
+    onMounted(() => {
+      console.log(typeof route.params.id, 225)
+    })
 
     return {
       playlistInfo,
