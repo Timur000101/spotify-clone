@@ -6,10 +6,10 @@
       </div>
       <div v-if="trackInfo.artists" class="player__nowPlaying-info">
         <span>
-          <a>{{ trackInfo.artists[0].name }}</a>
+          <a>{{ trackInfo.name }}</a>
         </span>
         <span>
-          <a>{{ trackInfo.name }}</a>
+          <a>{{ trackInfo.artists[0].name }}</a>
         </span>
       </div>
       <div class="player__nowPlaying-actions">
@@ -111,6 +111,7 @@
       </div>
       <div class="player__controls-playback-bar">
         <div class="player__progressBar">
+          <input type="range">
         </div>
       </div>
     </div>
@@ -278,6 +279,13 @@ export default defineComponent({
       transition: transform 0.15s ease-out;
       svg {
         fill: black;
+      }
+    }
+  }
+  &-playback-bar {
+    .player__progressBar {
+      input {
+        width: 100%;
       }
     }
   }

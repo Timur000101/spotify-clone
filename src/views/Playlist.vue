@@ -101,12 +101,25 @@
                 :key="track.added_at"
                 @mouseover="trackRowOverHandler(track.track.id)"
                 @mouseleave="trackRowLeaveHandler(track.track.id)"
-                @click="playTrack(track.track.id)"
+                @dblclick="playTrack(track.track.id)"
+                @click="selectTrack(track.track.id)"
                 class="tracksTable__row"
+                :class="
+                  currentSelectTrackId == track.track.id
+                    ? 'tracksTable__row-active'
+                    : ''
+                "
               >
                 <div class="tracksTable__row-body">
                   <div>
-                    <button v-if="track.track.hover" class="track__play-button">
+                    <button
+                      v-if="
+                        track.track.hover ||
+                        (currentSelectTrackId === track.track.id &&
+                          currentPLayTrackId !== track.track.id)
+                      "
+                      class="track__play-button"
+                    >
                       <svg
                         height="32"
                         role="img"
@@ -119,6 +132,15 @@
                         ></polygon>
                       </svg>
                     </button>
+                    <div v-else-if="currentPLayTrackId === track.track.id">
+                      <img
+                        class="n5XwsUqagSoVk8oMiw1x"
+                        width="14"
+                        height="14"
+                        alt=""
+                        src="https://open.scdn.co/cdn/images/equaliser-animated-green.f93a2ef4.gif"
+                      />
+                    </div>
                     <span v-else>{{ index + 1 }}</span>
                   </div>
                   <div>
@@ -156,7 +178,7 @@ import { defineComponent, ref, Ref, computed, watch, onMounted } from "vue";
 import SpotifyWebApi from "spotify-web-api-js";
 import { playlistTracksSize } from "@/helpers/playlist";
 import Wrapper from "./Wrapper.vue";
-import Player from "@/components/Player.vue"
+import Player from "@/components/Player.vue";
 const spotify = new SpotifyWebApi();
 
 export default defineComponent({
@@ -166,17 +188,23 @@ export default defineComponent({
   },
   setup(props) {
     const route = useRoute();
-    const playlistInfo: Ref<object> = ref<object>({});
-    const playlistTracks: Ref<Array<object>> = ref<Array<object>>([]);
+    const playlistInfo: Ref<object> = ref({});
+    const playlistTracks: Ref<Array<object>> = ref([]);
     const playlistId: string = String(route.params.id);
+    let currentPLayTrackId = ref<string>("");
+    let currentSelectTrackId = ref<string>("");
+
     const playlistTracksSz = playlistTracksSize;
-    let currentPLayTrackId = ref<string>('')
     spotify.setAccessToken(sessionStorage.token);
 
     watch(currentPLayTrackId, (newValue) => {
-      currentPLayTrackId.value = newValue
-    })
-    console.log(playlistId);
+      currentPLayTrackId.value = newValue;
+    });
+
+    watch(currentSelectTrackId, (newValue) => {
+      currentSelectTrackId.value = newValue;
+    });
+
     if (sessionStorage.getItem("token")) {
       spotify.getPlaylist(playlistId).then((res) => {
         playlistInfo.value = res;
@@ -185,46 +213,50 @@ export default defineComponent({
     }
 
     const allTracksSize = computed(() => {
-      let playlistDurationSize = 0;
-      playlistTracks.value.forEach((item) => {
-        console.log(typeof item)
+      let playlistDurationSize: number = 0;
+      playlistTracks.value.forEach((item: any) => {
         playlistDurationSize += item.track.duration_ms;
       });
       return playlistDurationSize;
     });
 
-    const trackRowOverHandler = function(trackId: string) {
+    const trackRowOverHandler = function (trackId: string) {
       playlistTracks.value.forEach((item: any) => {
         if (item.track.id === trackId) {
-          item.track.hover = true
+          item.track.hover = true;
         }
       });
-    }
+    };
 
-    const trackRowLeaveHandler = function(trackId: string) {
+    const trackRowLeaveHandler = function (trackId: string) {
       playlistTracks.value.forEach((item: any) => {
         if (item.track.id === trackId) {
-          item.track.hover = false
+          item.track.hover = false;
         }
       });
-    }
-    const playTrack = function(trackId: string) {
-      currentPLayTrackId.value = trackId
+    };
+
+    const playTrack = function (trackId: string) {
+      currentPLayTrackId.value = trackId;
       spotify
         .play({
-          uris: [`spotify:track:${trackId}`]
+          uris: [`spotify:track:${trackId}`],
         })
         .then((res) => {
           spotify.getMyCurrentPlayingTrack().then((r) => {
             console.log(r);
-          })
-        })
-      sessionStorage.setItem('currentTrack', trackId)
-    }
+          });
+        });
+      sessionStorage.setItem("currentTrack", trackId);
+    };
+
+    const selectTrack = function (trackId: string) {
+      currentSelectTrackId.value = trackId;
+    };
 
     onMounted(() => {
-      console.log(typeof route.params.id, 225)
-    })
+      console.log(typeof route.params.id, 225);
+    });
 
     return {
       playlistInfo,
@@ -235,6 +267,8 @@ export default defineComponent({
       trackRowLeaveHandler,
       playTrack,
       currentPLayTrackId,
+      currentSelectTrackId,
+      selectTrack,
     };
   },
 });
@@ -413,7 +447,7 @@ export default defineComponent({
     &:hover {
       border: 1px solid transparent;
       border-radius: 4px;
-      background-color: rgba(255, 255, 255, 0.3);
+      background-color: rgba(255, 255, 255, 0.1);
     }
     &-body {
       display: grid;
@@ -421,6 +455,11 @@ export default defineComponent({
       align-items: center;
       grid-gap: 16px;
     }
+  }
+  .tracksTable__row-active {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    border: 1px solid transparent;
+    border-radius: 4px;
   }
 }
 
